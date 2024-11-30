@@ -190,7 +190,7 @@ class ComplaintResolver extends Thread {
 }
 
 class Admin extends Person {
-    String name;
+    private String name;
 
     Admin(String name, String id) {
         super(name, id);
