@@ -28,13 +28,13 @@ CREATE TABLE IF NOT EXISTS public.student
 );
 CREATE TABLE IF NOT EXISTS public.fee
 (
-    fee_id INTEGER NOT NULL DEFAULT nextval('fee_fee_id_seq'::regclass),  -- Fee record ID
-    stid CHARACTER VARYING NOT NULL,                                          -- Student ID (Foreign key)
-    amount_paid NUMERIC(10, 2),                                                -- Amount paid
-    payment_date TEXT,                                                         -- Payment date
-    CONSTRAINT fee_pkey PRIMARY KEY (fee_id),                                 -- Primary key constraint
-    CONSTRAINT fk_student FOREIGN KEY (stid)                                  -- Foreign key to student table
-        REFERENCES public.student (id)
+    fee_id integer NOT NULL DEFAULT nextval('fee_fee_id_seq'::regclass),
+    stid character varying COLLATE pg_catalog."default" NOT NULL,
+    amount_paid numeric(10,2),
+    payment_date date,
+    CONSTRAINT fee_pkey PRIMARY KEY (fee_id),
+    CONSTRAINT fk_student FOREIGN KEY (stid)
+        REFERENCES public.student (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 );
