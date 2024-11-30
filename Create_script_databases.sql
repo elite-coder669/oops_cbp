@@ -1,8 +1,8 @@
 -- Table: public.complaint
 
--- DROP TABLE IF EXISTS public.complaint;
+DROP TABLE IF EXISTS public.complaint;
 
-CREATE TABLE IF NOT EXISTS public.complaint
+CREATE TABLE public.complaint
 (
     cname character varying(50) COLLATE pg_catalog."default",
     cstatus boolean DEFAULT false,
@@ -16,14 +16,14 @@ CREATE TABLE IF NOT EXISTS public.complaint
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.complaint
-    OWNER to postgres;
+ALTER TABLE public.complaint
+    OWNER TO postgres;
 
 -- Table: public.fee
 
--- DROP TABLE IF EXISTS public.fee;
+DROP TABLE IF EXISTS public.fee;
 
-CREATE TABLE IF NOT EXISTS public.fee
+CREATE TABLE public.fee
 (
     fee_id integer NOT NULL DEFAULT nextval('fee_fee_id_seq'::regclass),
     stid character varying COLLATE pg_catalog."default" NOT NULL,
@@ -32,21 +32,20 @@ CREATE TABLE IF NOT EXISTS public.fee
     CONSTRAINT fee_pkey PRIMARY KEY (fee_id),
     CONSTRAINT fk_student FOREIGN KEY (stid)
         REFERENCES public.student (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
+        ON UPDATE CASCADE
         ON DELETE CASCADE
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.fee
-    OWNER to postgres;
-
+ALTER TABLE public.fee
+    OWNER TO postgres;
 
 -- Table: public.room
 
--- DROP TABLE IF EXISTS public.room;
+DROP TABLE IF EXISTS public.room;
 
-CREATE TABLE IF NOT EXISTS public.room
+CREATE TABLE public.room
 (
     rno integer NOT NULL,
     rsize integer,
@@ -56,14 +55,14 @@ CREATE TABLE IF NOT EXISTS public.room
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.room
-    OWNER to postgres;
+ALTER TABLE public.room
+    OWNER TO postgres;
 
 -- Table: public.staff
 
--- DROP TABLE IF EXISTS public.staff;
+DROP TABLE IF EXISTS public.staff;
 
-CREATE TABLE IF NOT EXISTS public.staff
+CREATE TABLE public.staff
 (
     stid character varying(4) COLLATE pg_catalog."default" NOT NULL,
     stname character varying(20) COLLATE pg_catalog."default",
@@ -72,15 +71,14 @@ CREATE TABLE IF NOT EXISTS public.staff
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.staff
-    OWNER to postgres;
-
+ALTER TABLE public.staff
+    OWNER TO postgres;
 
 -- Table: public.student
 
--- DROP TABLE IF EXISTS public.student;
+DROP TABLE IF EXISTS public.student;
 
-CREATE TABLE IF NOT EXISTS public.student
+CREATE TABLE public.student
 (
     id character varying COLLATE pg_catalog."default" NOT NULL,
     name character varying COLLATE pg_catalog."default" NOT NULL,
@@ -92,11 +90,11 @@ CREATE TABLE IF NOT EXISTS public.student
     CONSTRAINT students_pkey PRIMARY KEY (id),
     CONSTRAINT fk_rno FOREIGN KEY (room)
         REFERENCES public.room (rno) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 )
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS public.student
-    OWNER to postgres;
+ALTER TABLE public.student
+    OWNER TO postgres;
