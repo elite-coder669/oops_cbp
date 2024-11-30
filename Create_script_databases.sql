@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.complaint
     CONSTRAINT fk_student FOREIGN KEY (student_id)
         REFERENCES public.student (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 )
 
 TABLESPACE pg_default;
