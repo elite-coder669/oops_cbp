@@ -72,17 +72,11 @@ class Student extends Person {
 
                     // Prepare statement to insert fee payment details
                     PreparedStatement pstmt = con.prepareStatement(insertFeeQuery);
-                    pstmt.setString(1, id);
-                    pstmt.setInt(2, paidAmount);
 
-                    // Format the current date as "DD-MM-YYYY"
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    String formattedDate = dateFormat.format(new Date());
+                    pstmt.setString(1, id);  // Set student ID
+                    pstmt.setDouble(2, paidAmount);   // Set the fee amount
+                    pstmt.setDate(3, java.sql.Date.valueOf("2024-11-01")); // Set the payment date
 
-                    // Set the formatted date
-                    pstmt.setString(3, formattedDate);
-
-                    // Execute the insert query
                     pstmt.executeUpdate();
                     System.out.println("Fee payment details added to the fee table.");
 
@@ -113,20 +107,25 @@ class Student extends Person {
     public static void issueComplaint(String id) {
         System.out.println("Enter Complaint");
         Scanner inp = new Scanner(System.in);
-        String com = inp.nextLine();
+        String complaint = inp.nextLine();
         System.out.println("Enter department");
-        String jobTitle = inp.nextLine();
-        String sqlQuery = String.format("insert into complaint values ('%s', FALSE, '%s')",com, jobTitle);
+        String department = inp.nextLine();
+
+        // Correctly format the SQL query, handling boolean and passing all variables
+        String sqlQuery = String.format(
+            "INSERT INTO complaint (cname, cstatus, department, Student_id) VALUES ('%s', false, '%s', '%s')",
+            complaint, department, id
+        );
         ReadAndRemoveRows.updateRow(sqlQuery);
         System.out.println("Complaint issued.");
     }
+
     public static void getComplaintStatus(String studentId) {
         String query = String.format("SELECT cname, cstatus FROM complaint WHERE Student_id = '%s'", studentId);
 
         try (Connection con = ConnectToServer.connectToServer();
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
-
             boolean foundComplaints = false;
 
             System.out.println("Complaints placed by student (ID: " + studentId + "):");
