@@ -58,6 +58,7 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.room
     OWNER to postgres;
 
+
 -- Table: public.student
 
 -- DROP TABLE IF EXISTS public.student;
@@ -71,14 +72,20 @@ CREATE TABLE IF NOT EXISTS public.student
     feepending integer,
     password character varying COLLATE pg_catalog."default",
     room integer,
+    mobilenumber character(10) COLLATE pg_catalog."default",
+    parentmobilenumber character(10) COLLATE pg_catalog."default",
     CONSTRAINT students_pkey PRIMARY KEY (id),
     CONSTRAINT fk_rno FOREIGN KEY (room)
         REFERENCES public.room (rno) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT chk_mobilenumber CHECK (mobilenumber ~ '^\d{10}$'::text),
+    CONSTRAINT chk_parentmobilenumber CHECK (parentmobilenumber ~ '^\d{10}$'::text)
 )
 
 TABLESPACE pg_default;
 
+ALTER TABLE IF EXISTS public.student
+    OWNER to postgres;
 ALTER TABLE IF EXISTS public.student
     OWNER to postgres;
