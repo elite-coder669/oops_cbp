@@ -29,8 +29,7 @@ CREATE TABLE IF NOT EXISTS public.fee
     stid character varying COLLATE pg_catalog."default" NOT NULL,
     amount_paid numeric(10,2),
     payment_date date,
-    CONSTRAINT fee_pkey PRIMARY KEY (fee_id),
-    CONSTRAINT fk_student FOREIGN KEY (stid)
+        CONSTRAINT fk_student FOREIGN KEY (stid)
         REFERENCES public.student (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
