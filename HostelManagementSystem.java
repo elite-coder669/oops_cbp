@@ -19,19 +19,28 @@ class Person {
 }
 
 class Student extends Person {
-    String course;
+	String course;
     int yr;
     int feePending;
     String password;
+    String mobilenumber;
+    String parentmobilenumber;
 
-    Student(String name, int age, String id, String course, int yr, String password) {
+    Student(String name, int age, String id, String course, int yr, String password, String mobilenumber, String parentmobilenumber) {
         super(name, id);
         this.yr = yr;
         this.course = course;
         this.password = password;
+        this.mobilenumber = mobilenumber;
+        this.parentmobilenumber = parentmobilenumber;
         this.feePending = 0;
-            String sqlQuery = String.format("insert into student values ('%s', '%s', '%s', %d, null, %d, %s)", this.id, this.name, this.course, this.yr, this.feePending, this.password);
-            ReadAndRemoveRows.addRow(sqlQuery);
+
+        String sqlQuery = String.format(
+            "INSERT INTO student (id, name, course, year, feepending, password, room, mobilenumber, parentmobilenumber) " +
+            "VALUES ('%s', '%s', '%s', %d, %d, '%s', null, '%s', '%s')",
+            this.id, this.name, this.course, this.yr, this.feePending, this.password, this.mobilenumber, this.parentmobilenumber
+        );
+        ReadAndRemoveRows.addRow(sqlQuery);
     }
     public static void getDetails(String studentId) {
         String sqlQuery = String.format("select * from student where id = '%s'",studentId);
@@ -196,33 +205,34 @@ class Admin extends Person {
     }
 
     public static void insertStudent() {
-        System.out.println("Enter student id: ");
         Scanner inp = new Scanner(System.in);
+
+        System.out.println("Enter student id: ");
         String sid = inp.nextLine();
+
         System.out.println("Enter Student name: ");
         String sname = inp.nextLine();
+
         System.out.println("Enter course: ");
         String scourse = inp.nextLine();
-        System.out.println("Enter year: ");
-        int year = 0;
-        try {
-            year = inp.nextInt();
-        } catch (InputMismatchException e) {
-            e.printStackTrace();
-        }
-        inp.nextLine();
 
-        System.out.println("Enter room preference: (1 : Single Room, 2 : Two Sharing, 3: Three Sharing, 4: Four Sharing)");
-        int rp = 0;
-        try {
-            rp = inp.nextInt();
-        } catch(InputMismatchException e) {
-            System.out.println("Input must be an integer.");
-        }
-            inp.nextLine();
+        System.out.println("Enter year: ");
+        int year = inp.nextInt();
+        inp.nextLine(); // Clear the newline
+
+        System.out.println("Enter mobile number (10 digits): ");
+        String mobilenumber = inp.nextLine();
+
+        System.out.println("Enter parent's mobile number (10 digits): ");
+        String parentmobilenumber = inp.nextLine();
+
+        System.out.println("Enter room preference: (1: Single Room, 2: Two Sharing, 3: Three Sharing, 4: Four Sharing)");
+        int rp = inp.nextInt();
+        inp.nextLine(); // Clear the newline
+
         String rno = null;
-        String query = String.format("select rno from room where rsize = %d and vacancies > 0", rp);
-       
+        String query = String.format("SELECT rno FROM room WHERE rsize = %d AND vacancies > 0", rp);
+
         try {
             Connection con = ConnectToServer.connectToServer();
             Statement stmt = con.createStatement();
@@ -230,31 +240,28 @@ class Admin extends Person {
             if (rs.next()) {
                 rno = rs.getString(1);
             }
-
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (rno != null) {
-            int roomFee = 0;
-            switch (rp) {
-                case 1:
-                    roomFee = 10000;
-                    break;
-                case 2:
-                    roomFee = 9000;
-                    break;
-                case 3:
-                    roomFee = 8000;
-                    break;
-                case 4:
-                    roomFee = 7000;
-                    break;
-                default:
-                    System.out.println(rp + " sharing not available.");
-            }
 
-            String insertQuery = String.format("insert into student values ('%s', '%s', '%s', %d, %d, '%s', %d)", sid, sname, scourse, year, roomFee, sid, Integer.parseInt(rno));
-            String updateQuery = String.format("update room set vacancies = vacancies - 1 where rno = %d", Integer.parseInt(rno));
+        if (rno != null) {
+            int roomFee = switch (rp) {
+                case 1 -> 10000;
+                case 2 -> 9000;
+                case 3 -> 8000;
+                case 4 -> 7000;
+                default -> {
+                    System.out.println(rp + " sharing not available.");
+                    yield 0;
+                }
+            };
+
+            String insertQuery = String.format(
+                "INSERT INTO student (id, name, course, year, feepending, password, room, mobilenumber, parentmobilenumber) " +
+                "VALUES ('%s', '%s', '%s', %d, %d, '%s', %d, '%s', '%s')",
+                sid, sname, scourse, year, roomFee, sid, Integer.parseInt(rno), mobilenumber, parentmobilenumber
+            );
+            String updateQuery = String.format("UPDATE room SET vacancies = vacancies - 1 WHERE rno = %d", Integer.parseInt(rno));
 
             try (Connection con = ConnectToServer.connectToServer()) {
                 con.setAutoCommit(false);
@@ -263,7 +270,6 @@ class Admin extends Person {
                      Statement stmt2 = con.createStatement()) {
 
                     stmt1.executeUpdate(insertQuery);
-
                     stmt2.executeUpdate(updateQuery);
 
                     con.commit();
@@ -274,7 +280,7 @@ class Admin extends Person {
                     System.out.println("Error adding student or updating room. Transaction rolled back.");
                 }
 
-                query = "select * from student order by id";
+                query = "SELECT * FROM student ORDER BY id";
                 System.out.println("Student Added.");
                 PrintRows.printRows(query);
             } catch (SQLException e) {
@@ -286,6 +292,7 @@ class Admin extends Person {
             System.out.println("No rooms available as per your preference.");
         }
     }
+
     public static void removeStudent() {
         System.out.println("Enter student id: ");
         Scanner inp = new Scanner(System.in);
